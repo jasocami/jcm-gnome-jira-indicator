@@ -2,7 +2,7 @@
 
 All notable changes to Jira Indicator. Versions follow [Semantic Versioning](https://semver.org/).
 
-## 1.0.0 (unreleased)
+## 1.0.0 (2026-10-15)
 
 First version: a GNOME Shell top-bar count of the Jira issues that still need you. Works with GNOME Shell 46 to 50
 (Ubuntu 24.04 LTS or newer) and Jira Cloud. It only reads from Jira; it never changes anything there.
