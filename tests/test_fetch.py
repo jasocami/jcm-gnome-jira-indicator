@@ -5,6 +5,7 @@ import contextlib
 import io
 import json
 import sys
+import tempfile
 import unittest
 import urllib.error
 from pathlib import Path
@@ -44,8 +45,9 @@ def jira_page(keys, next_token=None):
     return io.BytesIO(json.dumps(payload).encode())
 
 
-def http_error(code, headers=None):
-    return urllib.error.HTTPError('url', code, 'error', headers or {}, None)
+def http_error(code, headers=None, body=None):
+    fp = io.BytesIO(json.dumps(body).encode()) if body is not None else None
+    return urllib.error.HTTPError('url', code, 'error', headers or {}, fp)
 
 
 def run_main():
@@ -78,6 +80,13 @@ class MainTests(unittest.TestCase):
         patch = mock.patch('fetch.load_config', return_value=make_config())
         patch.start()
         self.addCleanup(patch.stop)
+        # Never write to the real log
+        log_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(log_dir.cleanup)
+        self.log_path = Path(log_dir.name) / 'state' / 'error.log'
+        log_patch = mock.patch('fetch.LOG_PATH', self.log_path)
+        log_patch.start()
+        self.addCleanup(log_patch.stop)
 
     @mock.patch('fetch.urllib.request.urlopen')
     def test_prints_issues_and_settings(self, urlopen):
@@ -110,6 +119,18 @@ class MainTests(unittest.TestCase):
         self.assertEqual(output['retry_after_minutes'], 10)
 
     @mock.patch('fetch.urllib.request.urlopen')
+    def test_shows_the_reason_jira_gives(self, urlopen):
+        urlopen.side_effect = http_error(400, body={'errorMessages': ["Field 'bogus' does not exist."], 'errors': {}})
+        output = run_main()
+        self.assertEqual(output['error'], "Jira answered HTTP 400: Field 'bogus' does not exist.")
+
+    @mock.patch('fetch.urllib.request.urlopen')
+    def test_shows_only_the_status_when_jira_gives_no_reason(self, urlopen):
+        urlopen.side_effect = http_error(500)
+        output = run_main()
+        self.assertEqual(output['error'], 'Jira answered HTTP 500')
+
+    @mock.patch('fetch.urllib.request.urlopen')
     def test_sends_email_and_token_as_basic_auth(self, urlopen):
         urlopen.side_effect = [jira_page([])]
         run_main()
@@ -120,6 +141,46 @@ class MainTests(unittest.TestCase):
         with mock.patch('fetch.load_config', return_value=make_config(CONFIG.replace('token = secret-token', ''))):
             output = run_main()
         self.assertIn('No API token', output['error'])
+
+
+    @mock.patch('fetch.urllib.request.urlopen')
+    def test_logs_each_error_with_the_time(self, urlopen):
+        urlopen.side_effect = http_error(400, body={'errorMessages': ['Bad JQL'], 'errors': {}})
+        run_main()
+        run_main()
+        lines = self.log_path.read_text().splitlines()
+        self.assertEqual(len(lines), 2)
+        self.assertRegex(lines[0], r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}  Jira answered HTTP 400: Bad JQL$')
+
+    @mock.patch('fetch.urllib.request.urlopen')
+    def test_does_not_log_a_successful_refresh(self, urlopen):
+        urlopen.side_effect = [jira_page(['A-1'])]
+        run_main()
+        self.assertFalse(self.log_path.exists())
+
+    @mock.patch('fetch.urllib.request.urlopen')
+    def test_keeps_only_the_last_lines(self, urlopen):
+        self.log_path.parent.mkdir(parents=True)
+        self.log_path.write_text(''.join(f'old {n}\n' for n in range(fetch.LOG_MAX_LINES)))
+        urlopen.side_effect = http_error(500)
+        run_main()
+        lines = self.log_path.read_text().splitlines()
+        self.assertEqual(len(lines), fetch.LOG_MAX_LINES)
+        self.assertEqual(lines[0], 'old 1')
+        self.assertIn('Jira answered HTTP 500', lines[-1])
+
+    @mock.patch('fetch.urllib.request.urlopen')
+    def test_never_logs_the_token(self, urlopen):
+        urlopen.side_effect = http_error(401)
+        run_main()
+        self.assertNotIn('secret-token', self.log_path.read_text())
+
+    @mock.patch('fetch.urllib.request.urlopen')
+    def test_still_reports_the_error_when_the_log_cannot_be_written(self, urlopen):
+        urlopen.side_effect = http_error(500)
+        with mock.patch('fetch.LOG_PATH', Path('/proc/not-writable/error.log')):
+            output = run_main()
+        self.assertEqual(output['error'], 'Jira answered HTTP 500')
 
 
 if __name__ == '__main__':

@@ -7,13 +7,18 @@ Test it by hand with:  python3 fetch.py | python3 -m json.tool
 import base64
 import configparser
 import json
+import os
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 
 APP_NAME = 'jcm-gnome-jira-indicator'
 CONFIG_PATH = Path.home() / '.config' / APP_NAME / 'config.ini'
+# Same folder as the extension's seen.json (GLib.get_user_state_dir())
+LOG_PATH = Path(os.environ.get('XDG_STATE_HOME') or Path.home() / '.local' / 'state') / APP_NAME / 'error.log'
+LOG_MAX_LINES = 200
 PAGE_SIZE = 100
 TIMEOUT_SECONDS = 20
 
@@ -62,6 +67,27 @@ def retry_minutes(error, default=10):
         return default
 
 
+def jira_message(error):
+    """The reason Jira gives in the error body (errorMessages and field errors), or None when there is none."""
+    try:
+        body = json.loads(error.read())
+        messages = body.get('errorMessages', []) + list(body.get('errors', {}).values())
+    except Exception:  # empty or non-JSON body: fall back to the bare status code
+        return None
+    return ' '.join(str(message) for message in messages) or None
+
+
+def log_error(message):
+    """Append the error to error.log with the time, keeping only the last LOG_MAX_LINES lines."""
+    try:
+        lines = LOG_PATH.read_text().splitlines() if LOG_PATH.exists() else []
+        lines.append(f'{datetime.now():%Y-%m-%d %H:%M:%S}  {" ".join(message.split())}')
+        LOG_PATH.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        LOG_PATH.write_text('\n'.join(lines[-LOG_MAX_LINES:]) + '\n')
+    except OSError:  # a log that cannot be written must not hide the error from the top bar
+        pass
+
+
 def main():
     output = {
         'title': 'Jira', 'refresh_minutes': 5, 'summary_max_chars': 60, 'help': 'online',
@@ -96,9 +122,12 @@ def main():
             output['error'] = 'Jira is rate limiting: the next refresh waits'
             output['retry_after_minutes'] = retry_minutes(error)
         else:
-            output['error'] = f'Jira answered HTTP {error.code}'
+            message = jira_message(error)
+            output['error'] = f'Jira answered HTTP {error.code}' + (f': {message}' if message else '')
     except Exception as error:  # any other failure is shown in the top bar instead of crashing
         output['error'] = str(error) or type(error).__name__
+    if output['error']:
+        log_error(output['error'])
     print(json.dumps(output))
 
 

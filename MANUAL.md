@@ -99,7 +99,9 @@ Useful `jql` values:
 
 ## When something goes wrong
 
-The menu shows the reason next to `⚠`.
+The menu shows the reason next to `⚠`. Every error is also saved, with the time, in
+`~/.local/state/jcm-gnome-jira-indicator/error.log` (the last 200 lines), so you can see what happened while you were
+away: `tail ~/.local/state/jcm-gnome-jira-indicator/error.log`.
 
 | Message | Fix |
 | --- | --- |
@@ -107,7 +109,7 @@ The menu shows the reason next to `⚠`.
 | No API token | Set `token` in `config.ini` |
 | Jira rejected the login | Wrong email, or the token expired: create a new token and paste it into `config.ini` |
 | Jira is rate limiting | Nothing to do now; raise `refresh_minutes` if it happens often |
-| Jira answered HTTP 400 | The JQL has an error: paste it into Jira's advanced search to see where |
+| Jira answered HTTP 400: … | The JQL has an error; the text after the colon is Jira's reason. Fix `jql` in `config.ini` |
 | No section: … / No option … | A section or required key is missing from `config.ini`: compare with `config.example.ini` |
 | invalid literal for int() | A number key (`refresh_minutes`, `max_results`, `summary_max_chars`) contains text |
 | A network or timeout message | Offline, VPN or proxy issue. It recovers on its own at a later refresh |
@@ -119,7 +121,7 @@ It should say `ACTIVE`. If not, log out and in, then `gnome-extensions enable jc
 
 ```bash
 gnome-extensions uninstall jcm-gnome-jira-indicator@your-github-user.github.io   # removes the extension
-rm -r ~/.config/jcm-gnome-jira-indicator ~/.local/state/jcm-gnome-jira-indicator   # removes your settings and token
+rm -r ~/.config/jcm-gnome-jira-indicator ~/.local/state/jcm-gnome-jira-indicator   # removes your settings, token and error log
 ```
 
 Revoke the token too, at <https://id.atlassian.com/manage-profile/security/api-tokens>.
@@ -127,4 +129,5 @@ Revoke the token too, at <https://id.atlassian.com/manage-profile/security/api-t
 ## Privacy
 
 Jira Indicator talks only to the Jira site in your config. Your token is stored in plain text in `config.ini`, which the
-installer makes readable only by you; never commit or share that file. The list of seen issues is kept in `~/.local/state/jcm-gnome-jira-indicator/seen.json`.
+installer makes readable only by you; never commit or share that file. The list of seen issues is kept in `~/.local/state/jcm-gnome-jira-indicator/seen.json`, and the error log in
+`error.log` next to it; the log never contains your token.
