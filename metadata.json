@@ -1,8 +1,8 @@
 {
-  "uuid": "jcm-gnome-jira-indicator@your-github-user.github.io",
+  "uuid": "jcm-gnome-jira-indicator@jasocami.github.io",
   "name": "Jira Indicator",
   "description": "Counts the Jira issues that still need you and lists them in the top bar.",
   "shell-version": ["46", "47", "48", "49", "50"],
-  "url": "https://github.com/your-github-user/jcm-gnome-jira-indicator",
+  "url": "https://github.com/jasocami/jcm-gnome-jira-indicator",
   "version-name": "1.0.0"
 }

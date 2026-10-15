@@ -13,8 +13,8 @@ You need GNOME Shell 46 to 50 (Ubuntu 24.04 LTS or newer). Nothing else: no extr
 Paste one of these lines in a terminal (use `wget` if `curl` is not installed):
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/your-github-user/jcm-gnome-jira-indicator/main/install.sh | bash
-curl -fsSL https://raw.githubusercontent.com/your-github-user/jcm-gnome-jira-indicator/main/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/jasocami/jcm-gnome-jira-indicator/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jasocami/jcm-gnome-jira-indicator/main/install.sh | bash
 ```
 
 Or, from a downloaded copy of the source: `./install.sh` (or `make install`).
@@ -116,13 +116,13 @@ away: `tail ~/.local/state/jcm-gnome-jira-indicator/error.log`.
 | invalid literal for int() | A number key (`refresh_minutes`, `max_results`, `summary_max_chars`, `visible_issues`) contains text |
 | A network or timeout message | Offline, VPN or proxy issue. It recovers on its own at a later refresh |
 
-Nothing in the top bar at all: run `gnome-extensions info jcm-gnome-jira-indicator@your-github-user.github.io`.
-It should say `ACTIVE`. If not, log out and in, then `gnome-extensions enable jcm-gnome-jira-indicator@your-github-user.github.io`.
+Nothing in the top bar at all: run `gnome-extensions info jcm-gnome-jira-indicator@jasocami.github.io`.
+It should say `ACTIVE`. If not, log out and in, then `gnome-extensions enable jcm-gnome-jira-indicator@jasocami.github.io`.
 
 ## Uninstall
 
 ```bash
-gnome-extensions uninstall jcm-gnome-jira-indicator@your-github-user.github.io   # removes the extension
+gnome-extensions uninstall jcm-gnome-jira-indicator@jasocami.github.io   # removes the extension
 rm -r ~/.config/jcm-gnome-jira-indicator ~/.local/state/jcm-gnome-jira-indicator   # removes your settings, token and error log
 ```
 

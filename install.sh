@@ -2,8 +2,8 @@
 # Jira Indicator installer. Needs nothing beyond a standard Ubuntu GNOME desktop.
 #
 # Straight from GitHub (use whichever of the two your machine has):
-#   wget -qO- https://raw.githubusercontent.com/your-github-user/jcm-gnome-jira-indicator/main/install.sh | bash
-#   curl -fsSL https://raw.githubusercontent.com/your-github-user/jcm-gnome-jira-indicator/main/install.sh | bash
+#   wget -qO- https://raw.githubusercontent.com/jasocami/jcm-gnome-jira-indicator/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/jasocami/jcm-gnome-jira-indicator/main/install.sh | bash
 # From a downloaded copy of the source:
 #   ./install.sh        (or: make install)
 #
@@ -11,7 +11,7 @@
 set -euo pipefail
 
 NAME=jcm-gnome-jira-indicator
-REPO=your-github-user/$NAME
+REPO=jasocami/$NAME
 REF=${REF:-main}
 FILES=(metadata.json extension.js fetch.py config.example.ini MANUAL.md)
 CONFIG_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/$NAME

@@ -1,6 +1,6 @@
 # Jira Indicator
 
-[![CI](https://github.com/your-github-user/jcm-gnome-jira-indicator/actions/workflows/ci.yml/badge.svg)](https://github.com/your-github-user/jcm-gnome-jira-indicator/actions/workflows/ci.yml)
+[![CI](https://github.com/jasocami/jcm-gnome-jira-indicator/actions/workflows/ci.yml/badge.svg)](https://github.com/jasocami/jcm-gnome-jira-indicator/actions/workflows/ci.yml)
 
 A GNOME Shell top-bar counter of the Jira issues that still need you. It refreshes on its own, marks what changed
 since you last looked, and opens any issue in your browser with one click.
@@ -12,7 +12,7 @@ since you last looked, and opens any issue in your browser with one click.
 Nothing to install first. Paste one line in a terminal (`wget` is on every Ubuntu; `curl` works too):
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/your-github-user/jcm-gnome-jira-indicator/main/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/jasocami/jcm-gnome-jira-indicator/main/install.sh | bash
 ```
 
 Then put your Jira site, email and [API token](https://id.atlassian.com/manage-profile/security/api-tokens) in
@@ -37,7 +37,7 @@ Only the last 200 lines are kept, and the token is never written to it. Fixes fo
 ## Uninstall
 
 ```bash
-gnome-extensions uninstall jcm-gnome-jira-indicator@your-github-user.github.io                # removes the extension
+gnome-extensions uninstall jcm-gnome-jira-indicator@jasocami.github.io                # removes the extension
 rm -r ~/.config/jcm-gnome-jira-indicator ~/.local/state/jcm-gnome-jira-indicator  # removes your settings, token and error log
 ```
 
@@ -52,7 +52,7 @@ The installer (`./install.sh`, `make install` or the one-line install) puts file
 extension on. To undo every part of it yourself:
 
 ```bash
-UUID=jcm-gnome-jira-indicator@your-github-user.github.io
+UUID=jcm-gnome-jira-indicator@jasocami.github.io
 
 gnome-extensions disable "$UUID"                                   # turns it off and drops it from the enabled list
 rm -rf ~/.local/share/gnome-shell/extensions/"$UUID"               # the extension files
