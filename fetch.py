@@ -72,7 +72,7 @@ def jira_message(error):
     try:
         body = json.loads(error.read())
         messages = body.get('errorMessages', []) + list(body.get('errors', {}).values())
-    except Exception:  # empty or non-JSON body: fall back to the bare status code
+    except (OSError, ValueError, AttributeError, TypeError):  # unreadable, empty or non-JSON body: bare status code
         return None
     return ' '.join(str(message) for message in messages) or None
 
@@ -125,7 +125,7 @@ def main():
         else:
             message = jira_message(error)
             output['error'] = f'Jira answered HTTP {error.code}' + (f': {message}' if message else '')
-    except Exception as error:  # any other failure is shown in the top bar instead of crashing
+    except Exception as error:  # noqa: BLE001 - any other failure is shown in the top bar instead of crashing
         output['error'] = str(error) or type(error).__name__
     if output['error']:
         log_error(output['error'])
