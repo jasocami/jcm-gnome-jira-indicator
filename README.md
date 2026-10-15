@@ -32,6 +32,29 @@ Then revoke the token at <https://id.atlassian.com/manage-profile/security/api-t
 Developers who linked the folder with `make dev`: use `make uninstall` instead of `gnome-extensions uninstall`, which may
 follow the link and delete files in your working copy.
 
+### Uninstall by hand
+
+The installer (`./install.sh`, `make install` or the one-line install) puts files in three places and turns the
+extension on. To undo every part of it yourself:
+
+```bash
+UUID=jcm-gnome-jira-indicator@your-github-user.github.io
+
+gnome-extensions disable "$UUID"                                   # turns it off and drops it from the enabled list
+rm -rf ~/.local/share/gnome-shell/extensions/"$UUID"               # the extension files
+rm -rf ~/.config/jcm-gnome-jira-indicator ~/.local/state/jcm-gnome-jira-indicator   # settings, token, seen state
+```
+
+If `disable` says the extension does not exist (you have not logged out since installing), remove it from GNOME's
+enabled list instead: run `gsettings get org.gnome.shell enabled-extensions`, then `gsettings set` the same list
+without the `jcm-gnome-jira-indicator@…` entry, for example:
+
+```bash
+gsettings set org.gnome.shell enabled-extensions "['other@ext.org']"
+```
+
+`gnome-extensions list | grep jira` printing nothing confirms it is gone. Revoke the token as above.
+
 ## Development
 
 `make help` lists the developer commands: `make test`, `make dev` (link this folder instead of copying), `make fetch`,
