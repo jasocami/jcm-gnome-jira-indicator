@@ -45,7 +45,8 @@ The top bar shows `Jira 28 (2)`:
 Click it to open the menu:
 
 - **Issue rows:** `●` when it changed since you last looked, then key, status, summary and time since the last update.
-  Click a row to open the issue in your browser.
+  Click a row to open the issue in your browser. Past `visible_issues` rows (10 by default) the list scrolls, so the
+  actions below it stay in view.
 - **Nothing needs you right now:** shown instead of rows when your JQL matches no issues.
 - **Refresh now:** fetches the list immediately. It also shows when the last check happened.
 - **Edit settings…:** opens your `config.ini` in the text editor.
@@ -88,6 +89,7 @@ Useful `jql` values:
 | `title` | No | `Jira` | Text before the counter in the top bar. Emoji work. Empty shows only the numbers | `Work`, `📋` |
 | `refresh_minutes` | No | `5` | Minutes between automatic refreshes. Values below 1 count as 1 | `10` |
 | `summary_max_chars` | No | `60` | Longest summary shown in a menu row before it is cut with `…` | `80` |
+| `visible_issues` | No | `10` | How many issues the menu shows before the list scrolls. Values below 1 count as 1 | `15` |
 | `help` | No | `online` | What **Help** opens: `online` = this manual on GitHub, for your installed version; `local` = the copy installed with the extension (works offline) | `local` |
 
 ### Rules of the file format
@@ -111,7 +113,7 @@ away: `tail ~/.local/state/jcm-gnome-jira-indicator/error.log`.
 | Jira is rate limiting | Nothing to do now; raise `refresh_minutes` if it happens often |
 | Jira answered HTTP 400: … | The JQL has an error; the text after the colon is Jira's reason. Fix `jql` in `config.ini` |
 | No section: … / No option … | A section or required key is missing from `config.ini`: compare with `config.example.ini` |
-| invalid literal for int() | A number key (`refresh_minutes`, `max_results`, `summary_max_chars`) contains text |
+| invalid literal for int() | A number key (`refresh_minutes`, `max_results`, `summary_max_chars`, `visible_issues`) contains text |
 | A network or timeout message | Offline, VPN or proxy issue. It recovers on its own at a later refresh |
 
 Nothing in the top bar at all: run `gnome-extensions info jcm-gnome-jira-indicator@your-github-user.github.io`.

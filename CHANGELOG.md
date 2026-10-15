@@ -13,6 +13,8 @@ First version: a GNOME Shell top-bar count of the Jira issues that still need yo
   `Jira 28 (2)`.
 - The menu lists each issue with its key, status, summary (cut at `summary_max_chars`) and time since the last update.
   Clicking a row opens the issue in your browser.
+- The menu shows up to `visible_issues` issues (default 10) and scrolls for the rest, so a long list never pushes
+  **Refresh now**, **Edit settings…** and **Help** off the screen.
 - Changed issues get a `●` dot. Closing the menu marks everything as seen. The list of seen issues is kept in
   `~/.local/state/jcm-gnome-jira-indicator/seen.json` across logins.
 - Loading (`Jira …`) and empty (`Nothing needs you right now`) states.

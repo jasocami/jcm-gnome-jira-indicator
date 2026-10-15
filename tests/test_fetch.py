@@ -96,6 +96,7 @@ class MainTests(unittest.TestCase):
         self.assertEqual(output['title'], 'Work')
         self.assertEqual(output['refresh_minutes'], 1)  # 0 is raised to the minimum
         self.assertEqual(output['help'], 'online')
+        self.assertEqual(output['visible_issues'], 10)  # default when the key is missing
         self.assertEqual(output['issues'][0]['url'], 'https://example.atlassian.net/browse/A-1')
 
     @mock.patch('fetch.urllib.request.urlopen')
@@ -136,6 +137,12 @@ class MainTests(unittest.TestCase):
         run_main()
         header = urlopen.call_args.args[0].get_header('Authorization')
         self.assertEqual(header, 'Basic ' + base64.b64encode(b'someone@example.com:secret-token').decode())
+
+    def test_visible_issues_is_at_least_one(self):
+        with mock.patch('fetch.load_config', return_value=make_config(CONFIG + 'visible_issues = 0\n')), \
+                mock.patch('fetch.urllib.request.urlopen', side_effect=[jira_page([])]):
+            output = run_main()
+        self.assertEqual(output['visible_issues'], 1)
 
     def test_reports_a_missing_token(self):
         with mock.patch('fetch.load_config', return_value=make_config(CONFIG.replace('token = secret-token', ''))):

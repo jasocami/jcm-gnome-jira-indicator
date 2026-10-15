@@ -44,13 +44,15 @@ class JiraIndicator extends PanelMenu.Button {
         this._metadata = extension.metadata;
         this._scriptPath = GLib.build_filenamev([extension.path, 'fetch.py']);
         this._data = {
-            title: 'Jira', refresh_minutes: 5, summary_max_chars: 60, help: 'online',
+            title: 'Jira', refresh_minutes: 5, summary_max_chars: 60, visible_issues: 10, help: 'online',
             issues: [], error: null, retry_after_minutes: null,
         };
         this._loaded = false; // false until the first refresh finishes: the Loading state
         this._failures = 0; // failed refreshes in a row, for the backoff
         this._seen = this._loadSeen();
         this._lastCheck = null;
+        this._issueItems = [];
+        this._issueScroll = null;
         this._timerId = 0;
         this._cancellable = new Gio.Cancellable();
 
@@ -59,7 +61,9 @@ class JiraIndicator extends PanelMenu.Button {
 
         // Closing the menu counts as "I have seen everything in it", like reading a notification list.
         this.menu.connect('open-state-changed', (_menu, isOpen) => {
-            if (!isOpen)
+            if (isOpen)
+                this._fitIssueList();
+            else
                 this._markAllSeen();
         });
 
@@ -152,20 +156,46 @@ class JiraIndicator extends PanelMenu.Button {
         else if (issues.length === 0)
             this._addMenuInfo('Nothing needs you right now');
 
-        for (const issue of issues) {
+        // The issue rows sit in their own scrolling list, so a long list never pushes the actions off the screen.
+        const list = new PopupMenu.PopupMenuSection();
+        this._issueItems = issues.map(issue => {
             const dot = this._isNew(issue) ? '●' : '   ';
             const summary = issue.summary.length > maxChars ? `${issue.summary.slice(0, maxChars)}…` : issue.summary;
             const item = new PopupMenu.PopupMenuItem(
                 `${dot} ${issue.key}  [${issue.status}]  ${summary}  · ${timeAgo(issue.updated)}`);
-            item.connect('activate', () => openUri(issue.url));
-            this.menu.addMenuItem(item);
-        }
+            item.connect('activate', () => {
+                openUri(issue.url);
+                this.menu.close(); // rows inside the scroll view are not linked to the menu, so close it here
+            });
+            list.addMenuItem(item);
+            return item;
+        });
+        this._issueScroll = new St.ScrollView({
+            style_class: 'vfade',
+            hscrollbar_policy: St.PolicyType.NEVER,
+            vscrollbar_policy: St.PolicyType.AUTOMATIC,
+            child: list.actor,
+        });
+        const listSection = new PopupMenu.PopupMenuSection();
+        listSection.actor.add_child(this._issueScroll);
+        this.menu.addMenuItem(listSection);
+        this._fitIssueList();
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         const lastCheck = this._lastCheck ? this._lastCheck.toLocaleTimeString() : 'never';
         this._addMenuAction(`Refresh now  (last check ${lastCheck})`, () => this._refresh());
         this._addMenuAction('Edit settings…', () => openUri(GLib.filename_to_uri(CONFIG_FILE, null)));
         this._addMenuAction('Help', () => openUri(this._helpUri()));
+    }
+
+    // Caps the list at visible_issues rows; the rest is reached by scrolling. Measured from a real row so it
+    // follows the font size and display scaling.
+    _fitIssueList() {
+        if (!this._issueScroll || this._issueItems.length <= this._data.visible_issues)
+            return;
+        const [, rowHeight] = this._issueItems[0].get_preferred_height(-1);
+        if (rowHeight > 0)
+            this._issueScroll.height = rowHeight * this._data.visible_issues;
     }
 
     _addMenuInfo(text) {

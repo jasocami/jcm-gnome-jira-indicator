@@ -90,7 +90,7 @@ def log_error(message):
 
 def main():
     output = {
-        'title': 'Jira', 'refresh_minutes': 5, 'summary_max_chars': 60, 'help': 'online',
+        'title': 'Jira', 'refresh_minutes': 5, 'summary_max_chars': 60, 'visible_issues': 10, 'help': 'online',
         'error': None, 'retry_after_minutes': None, 'issues': [],
     }
     try:
@@ -98,6 +98,7 @@ def main():
         output['title'] = config.get('indicator', 'title', fallback='Jira')
         output['refresh_minutes'] = max(1, config.getint('indicator', 'refresh_minutes', fallback=5))
         output['summary_max_chars'] = config.getint('indicator', 'summary_max_chars', fallback=60)
+        output['visible_issues'] = max(1, config.getint('indicator', 'visible_issues', fallback=10))
         if config.get('indicator', 'help', fallback='online') == 'local':
             output['help'] = 'local'
         domain = config.get('jira', 'domain')
