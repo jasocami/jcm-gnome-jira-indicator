@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Lint Python
+        run: pipx run ruff check .
+      - name: Check install.sh
+        run: bash -n install.sh && shellcheck install.sh
+      - name: Unit tests
+        run: make test
+      - name: Check extension.js syntax
+        # .mjs makes Node parse it as an ES module, like GNOME Shell does
+        run: cp extension.js "$RUNNER_TEMP/extension.mjs" && node --check "$RUNNER_TEMP/extension.mjs"
+      - name: Check metadata.json
+        run: python3 -c "import json; m = json.load(open('metadata.json')); assert m['uuid'] and m['shell-version'] and m['version-name']"
+      - name: Build the zip
+        run: make pack
