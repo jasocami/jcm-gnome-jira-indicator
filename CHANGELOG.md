@@ -2,7 +2,7 @@
 
 All notable changes to Jira Indicator. Versions follow [Semantic Versioning](https://semver.org/).
 
-## 1.0.1 (Unreleased)
+## 1.0.1 (2026-10-16)
 
 ### Added
 
