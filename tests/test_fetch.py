@@ -62,7 +62,7 @@ class SearchTests(unittest.TestCase):
     @mock.patch('fetch.urllib.request.urlopen')
     def test_follows_pages_until_there_is_no_next_token(self, urlopen):
         urlopen.side_effect = [jira_page(['A-1', 'A-2'], next_token='page2'), jira_page(['A-3'])]
-        issues = fetch.search('example.atlassian.net', 'someone@example.com', 'token', 'jql', 100)
+        issues = fetch.search('example.atlassian.net', 'someone@example.com', 'token', 'jql', 100, 100)
         self.assertEqual([issue['key'] for issue in issues], ['A-1', 'A-2', 'A-3'])
         second_url = urlopen.call_args_list[1].args[0].full_url
         self.assertIn('nextPageToken=page2', second_url)
@@ -70,9 +70,18 @@ class SearchTests(unittest.TestCase):
     @mock.patch('fetch.urllib.request.urlopen')
     def test_stops_at_max_results(self, urlopen):
         urlopen.side_effect = [jira_page(['A-1', 'A-2', 'A-3'], next_token='page2')]
-        issues = fetch.search('example.atlassian.net', 'someone@example.com', 'token', 'jql', 2)
+        issues = fetch.search('example.atlassian.net', 'someone@example.com', 'token', 'jql', 2, 10)
         self.assertEqual(len(issues), 2)
         self.assertEqual(urlopen.call_count, 1)
+        self.assertIn('maxResults=2', urlopen.call_args.args[0].full_url)  # asks only for what is missing
+
+    @mock.patch('fetch.urllib.request.urlopen')
+    def test_asks_for_page_size_per_request(self, urlopen):
+        urlopen.side_effect = [jira_page(['A-1', 'A-2'], next_token='page2'), jira_page(['A-3'])]
+        issues = fetch.search('example.atlassian.net', 'someone@example.com', 'token', 'jql', 100, 2)
+        self.assertEqual(len(issues), 3)
+        for call in urlopen.call_args_list:
+            self.assertIn('maxResults=2', call.args[0].full_url)
 
 
 class MainTests(unittest.TestCase):
