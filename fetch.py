@@ -19,7 +19,6 @@ CONFIG_PATH = Path.home() / '.config' / APP_NAME / 'config.ini'
 # Same folder as the extension's seen.json (GLib.get_user_state_dir())
 LOG_PATH = Path(os.environ.get('XDG_STATE_HOME') or Path.home() / '.local' / 'state') / APP_NAME / 'error.log'
 LOG_MAX_LINES = 200
-PAGE_SIZE = 100
 TIMEOUT_SECONDS = 20
 
 
@@ -39,15 +38,15 @@ def get_token(config):
     return token
 
 
-def search(domain, email, token, jql, max_results):
+def search(domain, email, token, jql, max_results, page_size):
     """Run the JQL search, following pages until there are no more or max_results is reached."""
     auth = base64.b64encode(f'{email}:{token}'.encode()).decode()
     headers = {'Authorization': f'Basic {auth}', 'Accept': 'application/json'}
     issues, page_token = [], None
     while len(issues) < max_results:
         # Ask only for what is still missing, so a low max_results does not download a full page
-        page_size = min(PAGE_SIZE, max_results - len(issues))
-        params = {'jql': jql, 'fields': 'summary,status,updated', 'maxResults': page_size}
+        request_size = min(page_size, max_results - len(issues))
+        params = {'jql': jql, 'fields': 'summary,status,updated', 'maxResults': request_size}
         if page_token:
             params['nextPageToken'] = page_token
         url = f'https://{domain}/rest/api/3/search/jql?{urllib.parse.urlencode(params)}'
@@ -107,6 +106,7 @@ def main():
         email = config.get('jira', 'email')
         token = get_token(config)
         jql = config.get('jira', 'jql')
+        page_size = max(1, config.getint('jira', 'page_size', fallback=100))
         max_results = config.getint('jira', 'max_results', fallback=100)
         output['issues'] = [
             {
@@ -116,7 +116,7 @@ def main():
                 'updated': issue['fields']['updated'],
                 'url': f'https://{domain}/browse/{issue["key"]}',
             }
-            for issue in search(domain, email, token, jql, max_results)
+            for issue in search(domain, email, token, jql, max_results, page_size)
         ]
     except urllib.error.HTTPError as error:
         if error.code in (401, 403):

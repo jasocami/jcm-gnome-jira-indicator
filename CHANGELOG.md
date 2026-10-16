@@ -4,6 +4,11 @@ All notable changes to Jira Indicator. Versions follow [Semantic Versioning](htt
 
 ## 1.0.1 (Unreleased)
 
+### Added
+
+- `page_size` in `[jira]` sets how many issues each request to Jira asks for (default 100). It changes only the number
+  of requests per refresh, not which issues you see.
+
 ### Fixed
 
 - `fetch.py` asks Jira only for the issues still missing to reach `max_results`, instead of a full page of 100. With a
