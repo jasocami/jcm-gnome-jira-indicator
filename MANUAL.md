@@ -1,6 +1,6 @@
 # Jira Indicator: User Manual
 
-For version 1.0.0 · GNOME Shell 46 to 50 (Ubuntu 24.04 LTS or newer)
+For version 1.0.1 · GNOME Shell 46 to 50 (Ubuntu 24.04 LTS or newer)
 
 Jira Indicator keeps a count of the Jira issues that still need you in the GNOME top bar. It refreshes on its own,
 marks what changed since you last looked, and opens any issue in your browser with one click. It only reads from Jira;
@@ -72,6 +72,7 @@ No restart is needed.
 | `token` | Yes | (none) | Your Jira API token. It works like a password: keep this file private | `ATATT3x…` |
 | `jql` | Yes | (none) | Which issues are counted and listed. Any query valid in Jira's advanced search | see below |
 | `max_results` | No | `100` | Upper limit of issues loaded | `200` |
+| `page_size` | No | `100` | How many issues each request to Jira asks for. It only changes the number of requests, not which issues you see. Values below 1 count as 1 | `50` |
 
 Useful `jql` values:
 
@@ -113,7 +114,7 @@ away: `tail ~/.local/state/jcm-gnome-jira-indicator/error.log`.
 | Jira is rate limiting | Nothing to do now; raise `refresh_minutes` if it happens often |
 | Jira answered HTTP 400: … | The JQL has an error; the text after the colon is Jira's reason. Fix `jql` in `config.ini` |
 | No section: … / No option … | A section or required key is missing from `config.ini`: compare with `config.example.ini` |
-| invalid literal for int() | A number key (`refresh_minutes`, `max_results`, `summary_max_chars`, `visible_issues`) contains text |
+| invalid literal for int() | A number key (`refresh_minutes`, `max_results`, `page_size`, `summary_max_chars`, `visible_issues`) contains text |
 | A network or timeout message | Offline, VPN or proxy issue. It recovers on its own at a later refresh |
 
 Nothing in the top bar at all: run `gnome-extensions info jcm-gnome-jira-indicator@jasocami.github.io`.

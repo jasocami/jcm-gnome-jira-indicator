@@ -2,6 +2,18 @@
 
 All notable changes to Jira Indicator. Versions follow [Semantic Versioning](https://semver.org/).
 
+## 1.0.1 (2026-10-16)
+
+### Added
+
+- `page_size` in `[jira]` sets how many issues each request to Jira asks for (default 100). It changes only the number
+  of requests per refresh, not which issues you see.
+
+### Fixed
+
+- `fetch.py` asks Jira only for the issues still missing to reach `max_results`, instead of a full page of 100. With a
+  low `max_results` it no longer downloads issues it then drops.
+
 ## 1.0.0 (2026-10-15)
 
 First version: a GNOME Shell top-bar count of the Jira issues that still need you. Works with GNOME Shell 46 to 50
