@@ -2,6 +2,12 @@
 
 All notable changes to Jira Indicator. Versions follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Added
+
+- **Open Jira** in the menu, below **Refresh now**, opens your Jira site (`domain`) in your browser.
+
 ## 1.0.1 (2026-10-16)
 
 ### Added

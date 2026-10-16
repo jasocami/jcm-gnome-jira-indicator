@@ -106,6 +106,7 @@ class MainTests(unittest.TestCase):
         self.assertEqual(output['refresh_minutes'], 1)  # 0 is raised to the minimum
         self.assertEqual(output['help'], 'online')
         self.assertEqual(output['visible_issues'], 10)  # default when the key is missing
+        self.assertEqual(output['jira_url'], 'https://example.atlassian.net')
         self.assertEqual(output['issues'][0]['url'], 'https://example.atlassian.net/browse/A-1')
 
     @mock.patch('fetch.urllib.request.urlopen')
@@ -157,6 +158,7 @@ class MainTests(unittest.TestCase):
         with mock.patch('fetch.load_config', return_value=make_config(CONFIG.replace('token = secret-token', ''))):
             output = run_main()
         self.assertIn('No API token', output['error'])
+        self.assertEqual(output['jira_url'], 'https://example.atlassian.net')  # Open Jira works even without a token
 
 
     @mock.patch('fetch.urllib.request.urlopen')

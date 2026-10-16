@@ -49,6 +49,7 @@ Click it to open the menu:
   actions below it stay in view.
 - **Nothing needs you right now:** shown instead of rows when your JQL matches no issues.
 - **Refresh now:** fetches the list immediately. It also shows when the last check happened.
+- **Open Jira:** opens your Jira site (`domain` in `config.ini`) in your browser.
 - **Edit settings…:** opens your `config.ini` in the text editor.
 - **Help:** opens this manual.
 

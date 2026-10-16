@@ -92,7 +92,7 @@ def log_error(message):
 def main():
     output = {
         'title': 'Jira', 'refresh_minutes': 5, 'summary_max_chars': 60, 'visible_issues': 10, 'help': 'online',
-        'error': None, 'retry_after_minutes': None, 'issues': [],
+        'jira_url': None, 'error': None, 'retry_after_minutes': None, 'issues': [],
     }
     try:
         config = load_config()
@@ -103,6 +103,7 @@ def main():
         if config.get('indicator', 'help', fallback='online') == 'local':
             output['help'] = 'local'
         domain = config.get('jira', 'domain')
+        output['jira_url'] = f'https://{domain}'
         email = config.get('jira', 'email')
         token = get_token(config)
         jql = config.get('jira', 'jql')
