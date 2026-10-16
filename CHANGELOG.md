@@ -2,6 +2,13 @@
 
 All notable changes to Jira Indicator. Versions follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Fixed
+
+- `fetch.py` asks Jira only for the issues still missing to reach `max_results`, instead of a full page of 100. With a
+  low `max_results` it no longer downloads issues it then drops.
+
 ## 1.0.0 (2026-10-15)
 
 First version: a GNOME Shell top-bar count of the Jira issues that still need you. Works with GNOME Shell 46 to 50

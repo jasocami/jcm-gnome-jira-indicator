@@ -73,6 +73,7 @@ class SearchTests(unittest.TestCase):
         issues = fetch.search('example.atlassian.net', 'someone@example.com', 'token', 'jql', 2)
         self.assertEqual(len(issues), 2)
         self.assertEqual(urlopen.call_count, 1)
+        self.assertIn('maxResults=2', urlopen.call_args.args[0].full_url)  # asks only for what is missing
 
 
 class MainTests(unittest.TestCase):

@@ -45,7 +45,9 @@ def search(domain, email, token, jql, max_results):
     headers = {'Authorization': f'Basic {auth}', 'Accept': 'application/json'}
     issues, page_token = [], None
     while len(issues) < max_results:
-        params = {'jql': jql, 'fields': 'summary,status,updated', 'maxResults': PAGE_SIZE}
+        # Ask only for what is still missing, so a low max_results does not download a full page
+        page_size = min(PAGE_SIZE, max_results - len(issues))
+        params = {'jql': jql, 'fields': 'summary,status,updated', 'maxResults': page_size}
         if page_token:
             params['nextPageToken'] = page_token
         url = f'https://{domain}/rest/api/3/search/jql?{urllib.parse.urlencode(params)}'
