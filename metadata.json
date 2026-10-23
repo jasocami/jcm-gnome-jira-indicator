@@ -4,5 +4,5 @@
   "description": "Counts the Jira issues that still need you and lists them in the top bar.",
   "shell-version": ["46", "47", "48", "49", "50"],
   "url": "https://github.com/jasocami/jcm-gnome-jira-indicator",
-  "version-name": "1.0.1"
+  "version-name": "1.0.2"
 }

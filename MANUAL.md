@@ -1,6 +1,6 @@
 # Jira Indicator: User Manual
 
-For version 1.0.1 · GNOME Shell 46 to 50 (Ubuntu 24.04 LTS or newer)
+For version 1.0.2 · GNOME Shell 46 to 50 (Ubuntu 24.04 LTS or newer)
 
 Jira Indicator keeps a count of the Jira issues that still need you in the GNOME top bar. It refreshes on its own,
 marks what changed since you last looked, and opens any issue in your browser with one click. It only reads from Jira;
