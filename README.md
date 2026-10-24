@@ -3,7 +3,7 @@
 [![CI](https://github.com/jasocami/jcm-gnome-jira-indicator/actions/workflows/ci.yml/badge.svg)](https://github.com/jasocami/jcm-gnome-jira-indicator/actions/workflows/ci.yml)
 
 A GNOME Shell top-bar counter of the Jira issues that still need you. It refreshes on its own, marks what changed
-since you last looked, and opens any issue in your browser with one click.
+since you last looked, and opens any issue, or Jira itself, in your browser with one click.
 
 ![Jira Indicator in the GNOME top bar](docs/screenshot.png)
 

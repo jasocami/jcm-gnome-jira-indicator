@@ -1,6 +1,6 @@
 # Jira Indicator: User Manual
 
-For version 1.0.1 · GNOME Shell 46 to 50 (Ubuntu 24.04 LTS or newer)
+For version 1.0.2 · GNOME Shell 46 to 50 (Ubuntu 24.04 LTS or newer)
 
 Jira Indicator keeps a count of the Jira issues that still need you in the GNOME top bar. It refreshes on its own,
 marks what changed since you last looked, and opens any issue in your browser with one click. It only reads from Jira;
@@ -49,6 +49,7 @@ Click it to open the menu:
   actions below it stay in view.
 - **Nothing needs you right now:** shown instead of rows when your JQL matches no issues.
 - **Refresh now:** fetches the list immediately. It also shows when the last check happened.
+- **Open Jira:** opens your Jira site (`domain` in `config.ini`) in your browser.
 - **Edit settings…:** opens your `config.ini` in the text editor.
 - **Help:** opens this manual.
 

@@ -45,7 +45,7 @@ class JiraIndicator extends PanelMenu.Button {
         this._scriptPath = GLib.build_filenamev([extension.path, 'fetch.py']);
         this._data = {
             title: 'Jira', refresh_minutes: 5, summary_max_chars: 60, visible_issues: 10, help: 'online',
-            issues: [], error: null, retry_after_minutes: null,
+            jira_url: null, issues: [], error: null, retry_after_minutes: null,
         };
         this._loaded = false; // false until the first refresh finishes: the Loading state
         this._failures = 0; // failed refreshes in a row, for the backoff
@@ -184,6 +184,8 @@ class JiraIndicator extends PanelMenu.Button {
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         const lastCheck = this._lastCheck ? this._lastCheck.toLocaleTimeString() : 'never';
         this._addMenuAction(`Refresh now  (last check ${lastCheck})`, () => this._refresh());
+        if (this._data.jira_url) // unknown until config.ini has a domain
+            this._addMenuAction('Open Jira', () => openUri(this._data.jira_url));
         this._addMenuAction('Edit settings…', () => openUri(GLib.filename_to_uri(CONFIG_FILE, null)));
         this._addMenuAction('Help', () => openUri(this._helpUri()));
     }
